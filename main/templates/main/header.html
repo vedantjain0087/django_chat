@@ -1,0 +1,183 @@
+<html>
+<head>
+  <title>Commumity</title>
+    {% load staticfiles %}
+    <link rel="stylesheet" href="{% static '/static/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static '/static/js/bootstrap.min.js' %}">
+    <style>
+    .chat-window{
+      overflow: scroll;
+      padding:5px;
+    }
+    .message-sent{
+   display:inline-block;
+   clear:both;
+  background:#37c1bf;
+  color:white;
+  padding:10px;
+  float:right;
+  border-radius:5px;
+  margin-bottom:5px;
+
+}
+.message-receive{
+   display:inline-block;
+   clear:both;
+  background:#006AD9;
+  color:white;
+  padding:10px;
+  float:left;
+  border-radius:5px;
+  margin-bottom:5px;
+
+}
+.auth-receive{
+  display:inline-block;
+  clear:both;
+  float:left;
+    padding:2px;
+  color:black;
+  font-weight:bold;
+}
+.auth-sent{
+  display:inline-block;
+  clear:both;
+  float:right;
+    padding:2px;
+  color:black;
+  font-weight:bold;
+}
+    </style>
+</head>
+<body>
+  {% if page == 'home' %}
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="javascript:void(0)">COMMUNITY</a>
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navb">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  </nav>
+{% endif %}
+{% if page == 'dash' %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <a class="navbar-brand" href="javascript:void(0)">COMMUNITY</a>
+  <div class="navbar navbar-right">
+    <a class="item" href="main/logout">Logout</a>
+  </div>
+  <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navb">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+</nav>
+{% endif %}
+  {% block content %}
+  {% endblock %}
+
+{% if page == 'dash' %}
+<script src="{% static '/static/js/jquery.min.js' %}">
+</script>
+<script>
+  $.ajaxSetup({data: {
+    csrfmiddlewaretoken: '{{ csrf_token }}'
+  }});
+</script>
+<script>
+ $(document).ready(function(){
+
+   setInterval(function(){
+     $.ajax({
+         url: "main/add_chat/",
+         type: "post",
+         data:{"requ":"new"},
+         success: function (response) {
+        console.log(response);
+            // you will get response from your php page (what you echo or print)
+            if(response != "none" && response != '[]'){
+
+                $('.chat-window').scrollTop('99999');
+                var x = JSON.parse(response);
+                console.log(x[0].fields.new);
+                for(i=0; i < x.length; i++){
+                  var obj = x[i].fields;
+                    if(obj.name != $('.btn.btn-primary.btn-block.send').siblings('.sender').html()){
+                  $('.chat-window').append('<div class="receive-by"><div class="auth-receive">'+obj.name+'</div><div class="message-receive">'+obj.message+'</div></div>');
+                }
+              }
+            }
+
+         },
+         error: function(jqXHR, textStatus, errorThrown) {
+            console.log(textStatus, errorThrown);
+         }
+
+
+     });
+   },3000);
+ });
+
+ </script>
+ <script>
+ $('.btn.btn-primary.btn-block.send').click(function(){
+  msg =   $(this).siblings('.form-control.msg').val();
+  sender = $(this).siblings('.sender').html();
+if(msg.length != 0){
+    $.ajax({
+        url: "main/new_msg/",
+        type: "post",
+        data:{"name":sender,"message":msg},
+        success: function (response) {
+       console.log(response);
+           // you will get response from your php page (what you echo or print)
+           console.log("msg sent");
+           $('.btn.btn-primary.btn-block.send').siblings('.form-control.msg').val("");
+           $('.chat-window').append('<div class="sent-by"><div class="auth-sent">'+sender+'</div><div class="message-sent">'+msg+'</div></div>');
+
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+           console.log(textStatus, errorThrown);
+        }
+
+
+    });
+
+
+
+
+}else{
+  alert("You can`t send blank message dude");
+}
+ });
+ </script>
+ <script>
+ $(document).ready(function(){
+    $.ajax({
+        url: "main/all_msg/",
+        type: "post",
+        data:{},
+        success: function (response) {
+          if(response != "none"){
+
+              $('.chat-window').scrollTop('99999');
+              var x = JSON.parse(response);
+              console.log(x[0].fields.new);
+              for(i=0; i < x.length; i++){
+                var obj = x[i].fields;
+                  if(obj.name != $('.btn.btn-primary.btn-block.send').siblings('.sender').html()){
+                $('.chat-window').append('<div class="receive-by"><div class="auth-receive">'+obj.name+'</div><div class="message-receive">'+obj.message+'</div></div>');
+              }
+            }
+          }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+           console.log(textStatus, errorThrown);
+        }
+
+
+    });
+
+
+ });
+ </script>
+
+{% endif %}
+</body>
+</html>

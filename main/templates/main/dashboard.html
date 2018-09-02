@@ -1,0 +1,46 @@
+{% extends "main/header.html" %}
+{% block content %}
+<br>
+<div class="container">
+  <div class="row">
+    <div class="col-md-3">
+      <h4>Active Users</h4>
+      <ul>
+      {% for user in all_users %}
+      <li>{{user.name}}</li>
+      {% endfor %}
+    </ul>
+    </div>
+    <div class="col-md-6">
+      <center><h6>Chat</h6></center>
+      <div class="chat-window" style="border-left:0.5px solid grey;height:370px;">
+ <div class="sent-by">
+   <div class="auth-sent">
+     VEdabnt
+   </div>
+   <div class="message-sent">
+   sdfjnhds
+ </div>
+ </div>
+ <div class="receive-by">
+   <div class="auth-receive">
+     VEdabnt
+   </div>
+   <div class="message-receive">
+   sdfjnhds
+ </div>
+ </div>
+
+      </div>
+      <br>
+      <div class="admin-panel">
+          {% csrf_token %}
+      <textarea class="form-control msg"></textarea>
+      <br>
+      <button class="btn btn-primary btn-block send">Send</button>
+      <div class="sender">{{active_user}}</div>
+    </div>
+</div>
+</div>
+</div>
+{% endblock %}
